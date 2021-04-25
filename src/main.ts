@@ -37,6 +37,7 @@ async function bootstrap() {
         AppModule,
         new FastifyAdapter(),
     );
+    app.enableCors();
     app.setGlobalPrefix('api');
     await app.listen(PORT, '0.0.0.0');
     console.log(`Application is running on: ${await app.getUrl()}`);

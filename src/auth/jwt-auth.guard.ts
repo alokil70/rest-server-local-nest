@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
-import { useCaseSensitiveFileNames } from 'ts-loader/dist/utils';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

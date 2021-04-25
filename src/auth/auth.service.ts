@@ -1,40 +1,19 @@
-import {
-    Body,
-    HttpException,
-    HttpStatus,
-    Injectable,
-    Post,
-    UnauthorizedException,
-} from '@nestjs/common';
-import { CreateUserDto } from '../users/dto/create-user.dto';
-import { UsersService } from '../users/users.service';
+import { Body, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { User } from '../users/users.model';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private usersService: UsersService,
         private jwtService: JwtService,
+        private usersService: UsersService,
     ) {}
     async login(@Body() dto: CreateUserDto) {
         const user = await this.validateUser(dto);
         return this.genToken(user);
-    }
-
-    async registration(@Body() dto: CreateUserDto) {
-        const candidate = await this.usersService.getUserByEmail(dto.email);
-        if (candidate) {
-            throw new HttpException('email занят', HttpStatus.BAD_REQUEST);
-        }
-        const hashPasword = await bcrypt.hash(dto.password, 6);
-        const user = await this.usersService.createUser({
-            ...dto,
-            password: hashPasword,
-        });
-        console.log(this.genToken(user));
-        return user;
     }
 
     private async genToken(user: User) {
@@ -54,5 +33,11 @@ export class AuthService {
         throw new UnauthorizedException({
             message: 'Некорректный email или пароль',
         });
+    }
+
+    async getUserByToken(token: string, dto: CreateUserDto): Promise<User> {
+        const user = await this.jwtService.decode(token);
+        const res = await this.usersService.getUserByEmail('user1@gmail.com');
+        return res;
     }
 }
